@@ -1,0 +1,19 @@
+#! /bin/bash
+
+infiles=$(echo "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS")
+infilesq=$(echo "$infiles" | awk '{print "\042"$0"\042"}' | tr "\n" "\040")
+infilesq="${infilesq% }"
+
+whole=$(echo "$infiles" | head -1)
+fname=$(echo "$whole" | awk -F "/" '{print $NF}')
+fold="${whole%/$fname}"
+
+outfile=$(zenity --entry --title="Output File Name" --text="Enter Output Filename..")
+[[ "$?" != "0" ]] && exit 1
+
+foldnout=$(echo "${fold}/${outfile}.pdf" | awk '{print "\042"$0"\042"}')
+
+cmd="pdftk ${infilesq} cat output ${foldnout}"
+eval $cmd
+
+exit 0
